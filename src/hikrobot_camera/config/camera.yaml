@@ -11,4 +11,6 @@
     frame_rate: 30.0
     # Supported values: BGR8, RGB8, MONO8.
     pixel_format: "BGR8"
+    # Image publish reliability: "reliable" (matched by RViz2 defaults) or "best_effort".
+    image_qos_reliability: "reliable"
     reconnect_period_ms: 1000

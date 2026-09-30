@@ -38,6 +38,7 @@ private:
   std::string camera_ip_;
   std::string serial_number_;
   std::string image_topic_;
+  std::string image_qos_reliability_{"reliable"};
   std::string actual_frame_rate_topic_;
   double exposure_us_{10000.0};
   double gain_db_{0.0};

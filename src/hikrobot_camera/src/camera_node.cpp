@@ -76,6 +76,8 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options)
   camera_ip_ = declare_parameter("camera_ip", "");
   serial_number_ = declare_parameter("serial_number", "");
   image_topic_ = declare_parameter("image_topic", "/image_raw");
+  image_qos_reliability_ =
+    declare_parameter("image_qos_reliability", image_qos_reliability_);
   actual_frame_rate_topic_ =
     declare_parameter("actual_frame_rate_topic", "/camera/actual_fps");
   exposure_us_ = declare_parameter("exposure_us", exposure_us_);
@@ -85,14 +87,28 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options)
   reconnect_period_ms_ = declare_parameter("reconnect_period_ms", reconnect_period_ms_);
   if (exposure_us_ < 1.0 || exposure_us_ > 10000000.0 ||
     gain_db_ < 0.0 || gain_db_ > 100.0 || frame_rate_ <= 0.0 || frame_rate_ > 1000.0 ||
-    (pixel_format_ != "BGR8" && pixel_format_ != "RGB8" && pixel_format_ != "MONO8"))
+    (pixel_format_ != "BGR8" && pixel_format_ != "RGB8" && pixel_format_ != "MONO8") ||
+    (image_qos_reliability_ != "reliable" && image_qos_reliability_ != "best_effort"))
   {
     throw std::invalid_argument(
       "Invalid camera parameters: exposure_us [1,10000000], gain_db [0,100], "
-      "frame_rate (0,1000], pixel_format BGR8/RGB8/MONO8");
+      "frame_rate (0,1000], pixel_format BGR8/RGB8/MONO8, "
+      "image_qos_reliability reliable/best_effort");
   }
 
-  image_pub_ = create_publisher<sensor_msgs::msg::Image>(image_topic_, rclcpp::SensorDataQoS());
+  // A RELIABLE publisher is matched by both RELIABLE and BEST_EFFORT subscribers, so the
+  // default also works with RViz2 (whose Image display subscribes with RELIABLE). A
+  // BEST_EFFORT publisher is only matched by BEST_EFFORT subscribers.
+  rclcpp::QoS image_qos = rclcpp::QoS(rclcpp::KeepLast(5)).durability_volatile();
+  if (image_qos_reliability_ == "best_effort") {
+    image_qos.best_effort();
+  } else {
+    image_qos.reliable();
+  }
+  image_pub_ = create_publisher<sensor_msgs::msg::Image>(image_topic_, image_qos);
+  RCLCPP_INFO(
+    get_logger(), "Publishing images on %s with %s reliability",
+    image_topic_.c_str(), image_qos_reliability_.c_str());
   actual_frame_rate_pub_ =
     create_publisher<std_msgs::msg::Float64>(actual_frame_rate_topic_, 10);
   parameter_callback_ = add_on_set_parameters_callback(
@@ -210,9 +226,10 @@ bool CameraNode::connect()
   }
   if (rc == MV_OK) {
     handle_ = new_handle;
-    rc = configure();
-    if (rc != MV_OK) {
-      RCLCPP_ERROR(get_logger(), "Camera feature configuration failed: 0x%08x", rc);
+    if (!configure()) {
+      RCLCPP_ERROR(get_logger(), "Camera feature configuration failed");
+      disconnect();
+      return false;
     }
   }
   if (rc == MV_OK) {
@@ -477,6 +494,10 @@ rcl_interfaces::msg::SetParametersResult CameraNode::set_parameters(
         return result;
       }
       requested_pixel_format = value;
+    } else if (parameter.get_name() == "image_qos_reliability") {
+      result.successful = false;
+      result.reason = "image_qos_reliability is only applied at startup";
+      return result;
     }
   }
 

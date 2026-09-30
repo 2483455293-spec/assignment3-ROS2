@@ -70,12 +70,15 @@ ros2 launch hikrobot_camera camera.launch.py \
 | `camera_ip` | string | `""` | GigE 相机 IP；留空则不按 IP 筛选。 |
 | `serial_number` | string | `""` | 相机序列号；留空则不按序列号筛选。多个相机匹配时需指定选择器。 |
 | `image_topic` | string | `/image_raw` | 图像发布话题。 |
+| `image_qos_reliability` | string | `reliable` | 图像话题的 QoS 可靠性，取值 `reliable` 或 `best_effort`；只能在启动时设置。 |
 | `actual_frame_rate_topic` | string | `/camera/actual_fps` | 实际图像发布帧率话题，消息类型为 `std_msgs/msg/Float64`。 |
 | `exposure_us` | double | `10000.0` | 手动曝光时间，单位微秒，允许范围 `[1, 10000000]`；相机仍可能有更窄的能力范围。 |
 | `gain_db` | double | `0.0` | 手动增益，单位 dB，允许范围 `[0, 100]`；相机仍可能有更窄的能力范围。 |
 | `frame_rate` | double | `30.0` | 写入相机的目标采集帧率，允许范围 `(0, 1000]`；不等同于实际帧率。 |
 | `pixel_format` | string | `BGR8` | 输出格式；支持请求 `BGR8`、`RGB8`、`MONO8`，并由相机 SDK 验证是否可用。 |
 | `reconnect_period_ms` | integer | `1000` | 相机断开或未找到时的重试间隔（毫秒；实际定时器间隔至少 100 毫秒）。 |
+
+`image_qos_reliability` 决定图像发布端的 QoS 可靠性：`reliable` 发布者同时能匹配 `reliable` 和 `best_effort` 订阅者，因此默认值可直接与 RViz2 的 Image 显示通信；改成 `best_effort` 后，只有 `best_effort` 订阅者（例如把 Image 显示的 **QoS → Reliability Policy** 改为 *Best effort*，或用 `ros2 topic hz`）才收得到图像。发布端 QoS 不能在运行时修改，只能启动时指定。
 
 设置参数会校验类型、范围及 SDK 返回值；设备拒绝设置时，ROS 参数请求会失败并返回原因。相机断开时，合法的运行时参数会保留，并在下次连接时应用。
 
@@ -102,7 +105,7 @@ ros2 topic hz /image_raw
 ros2 topic echo /camera/actual_fps
 ```
 
-也可以在 RViz 2 中添加 **Image** 显示并选择 `/image_raw`。若需要查看 topic 的消息类型和发布者：
+也可以在 RViz 2 中添加 **Image** 显示并选择 `/image_raw`（默认 `image_qos_reliability: reliable` 与 RViz2 的默认 QoS 兼容，无需额外设置；若改成 `best_effort`，需同时把 Image 显示的 **QoS → Reliability Policy** 设为 *Best effort*）。若需要查看 topic 的消息类型和发布者：
 
 ```bash
 ros2 topic info /image_raw
