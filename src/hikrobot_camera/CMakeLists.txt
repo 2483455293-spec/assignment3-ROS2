@@ -37,7 +37,6 @@ if(MVS_INCLUDE_DIR AND MVS_LIBRARY)
 else()
   message(WARNING "Hikrobot MVS SDK not found; camera_node will build but cannot acquire images")
 endif()
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(camera_node PRIVATE -Wall -Wextra -Wpedantic)
 endif()

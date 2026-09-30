@@ -3,7 +3,6 @@
   <name>hikrobot_camera</name>
   <version>0.0.0</version>
   <description>ROS 2 driver for Hikrobot MVS USB3 Vision and GigE cameras.</description>
-  <!-- Replace placeholder maintainer and choose a license before publishing. -->
   <maintainer email="2483455293@qq.com">曹哲源</maintainer>
   <license>TODO</license>
   <buildtool_depend>ament_cmake</buildtool_depend>

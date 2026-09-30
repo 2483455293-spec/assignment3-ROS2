@@ -1,7 +1,7 @@
 /hikrobot_camera:
   ros__parameters:
     use_sim_time: false
-    # Leave both selectors empty only when exactly one camera is visible.
+
     camera_ip: ""
     serial_number: ""
     image_topic: "/image_raw"

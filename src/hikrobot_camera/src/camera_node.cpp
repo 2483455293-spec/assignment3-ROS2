@@ -596,4 +596,4 @@ rcl_interfaces::msg::SetParametersResult CameraNode::set_parameters(
   return result;
 }
 
-}  // namespace hikrobot_camera
+} 

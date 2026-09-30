@@ -117,6 +117,7 @@ ros2 topic info /image_raw
 - 在 WSL 中，USB 设备转发可能影响 MVS 控制和图像传输；若出现 USB 错误，请先确认 Windows 端设备已附加到 WSL，再检查 SDK 错误码和 USB 内核日志。
 - 当前环境中曾遇到相机枚举成功但 `MV_CC_OpenDevice` 返回 `0x80000301`（MVS USB 写入错误）。因此真实相机的打开、连续图像发布、RViz 显示、参数成像效果及断线重连，需要在 USB 通信恢复后继续实机验证。
 
+
 ## 目录结构
 
 ```text

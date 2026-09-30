@@ -63,6 +63,6 @@ private:
 #endif
 };
 
-}  // namespace hikrobot_camera
+}
 
-#endif  // HIKROBOT_CAMERA__CAMERA_NODE_HPP_
+#endif
