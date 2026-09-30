@@ -1,4 +1,4 @@
-"""Launch the training scaffold; this does not implement a camera driver."""
+"""Launch the Hikrobot MVS camera node."""
 
 from pathlib import Path
 

@@ -2,12 +2,15 @@
 <package format="3">
   <name>hikrobot_camera</name>
   <version>0.0.0</version>
-  <description>Training scaffold for a ROS 2 Humble camera SDK assignment.</description>
+  <description>ROS 2 driver for Hikrobot MVS USB3 Vision and GigE cameras.</description>
   <!-- Replace placeholder maintainer and choose a license before publishing. -->
-  <maintainer email="student@example.com">Student Name</maintainer>
+  <maintainer email="2483455293@qq.com">曹哲源</maintainer>
   <license>TODO</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>rclcpp</depend>
+  <depend>rcl_interfaces</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ament_index_python</exec_depend>
